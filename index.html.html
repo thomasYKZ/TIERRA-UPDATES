@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Tierra Updates XD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #0c0a09, #18181b);
+            min-height: 100vh;
+            color: #f4f4f5;
+        }
+        .card {
+            background: rgba(39, 39, 42, 0.6);
+            border: 1px solid #3f3f46;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-official {
+            background-color: #059669;
+        }
+        .badge-beta {
+            background-color: #3f3f46;
+        }
+        .input, .select {
+            background-color: #27272a;
+            border: 1px solid #3f3f46;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            color: #f4f4f5;
+        }
+        .select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23a1a1aa" d="m0 1 2 2 2-2z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 0.65rem;
+            padding-right: 2.5rem;
+        }
+        .update-item {
+            opacity: 0;
+            transform: translateY(8px);
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="border-b border-zinc-800 bg-zinc-950/50 backdrop-blur">
+        <div class="mx-auto max-w-5xl px-4 py-6">
+            <h1 class="text-3xl font-bold text-emerald-400">🌍 Tierra Updates XD</h1>
+            <p class="text-zinc-400 mt-1">El changelog oficial de la Tierra</p>
+        </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-4 py-10 space-y-10">
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <input 
+                type="text" 
+                id="searchInput"
+                placeholder="Buscar actualización..." 
+                class="input max-w-sm"
+            />
+            <select id="filterSelect" class="select w-40">
+                <option value="all">ALL</option>
+                <option value="Official">OFFICIALS</option>
+                <option value="Beta">BETAS</option>
+            </select>
+        </div>
+
+        <div id="updatesContainer" class="space-y-8">
+            <!-- Las actualizaciones se cargarán aquí con JavaScript -->
+        </div>
+    </main>
+
+    <script>
+        const UPDATES = [
+            {
+                version: "Tierra 2025.08.15",
+                codename: "Mediterranean Overheating Crisis",
+                date: "2025-08-15",
+                type: "Official",
+                highlights: [
+                    "Se ha implementado un sistema de emergencia climática en la región europea",
+                    "Se han activado tormentas de enfriamiento automático para contrarrestar el sobrecalentamiento",
+                    "Se ha corregido un bug crítico que causaba temperaturas superiores a 45°C en múltiples zonas",
+                    "Se han habilitado nuevas mecánicas de supervivencia para la población civil"
+                ],
+                sections: {
+                    Clima: [
+                        "Las zonas de alta presión se expandieron más de lo programado, causando una ola de calor extrema",
+                        "El sistema de vientos mediterráneos ha sido temporalmente deshabilitado para mantenimiento",
+                        "Se ha activado el protocolo de tormentas nocturnas para reducir la temperatura ambiental",
+                        "Se ha ajustado la humedad relativa en ciudades costeras para mejorar la habitabilidad"
+                    ],
+                    Política: [
+                        "Se han activado protocolos de cooperación internacional para gestión de crisis climáticas",
+                        "Los sistemas de alerta gubernamental han sido optimizados para respuesta más rápida",
+                        "Se ha implementado un nuevo sistema de coordinación entre ministerios de salud europeos",
+                        "Las declaraciones de emergencia nacional se procesan ahora de forma automática"
+                    ],
+                    "Top 10 Temas Virales en Colombia": [
+                        "La Plena - W Sound 05 (339.516 reproducciones)",
+                        "Ba Ba Bad Remix - Kybba, Sean Paul, Ryan Castro, Busy Signal (280.166)",
+                        "YO y TÚ - Ovy On The Drums, Quevedo, Beéle (222.819)",
+                        "no tiene sentido - Beéle (215.158)",
+                        "top diesel - Beéle (212.599)",
+                        "quédate - Beéle (204.290)",
+                        "Hiekka - Nicky Jam, Beéle (202.876)",
+                        "AMISTA - Ovy On The Drums (200.178)",
+                        "SANKA - Ryan Castro, Dongo (189.905)",
+                        "si te pillara - Beéle (180.184)"
+                    ],
+                    Tendencias: [
+                        "Incremento masivo en el uso de aplicaciones de monitoreo de temperatura corporal",
+                        "Las búsquedas de 'cómo mantenerse fresco' aumentaron 340% en la región",
+                        "Popularidad de contenido sobre supervivencia urbana disparada en redes sociales",
+                        "Aumento del 200% en ventas de aires acondicionados y ventiladores portátiles"
+                    ],
+                    Ecosistema: [
+                        "La fauna local ha activado automáticamente el modo de conservación de energía",
+                        "La vegetación mediterránea ha entrado en estado de supervivencia estacional",
+                        "Las reservas de agua subterránea están siendo monitoreadas con mayor frecuencia",
+                        "Incendios forestales: se ha aumentado la vigilancia y respuesta automática del sistema"
+                    ]
+                },
+            },
+        ];
+
+        let currentFilter = "all";
+        let currentQuery = "";
+
+        function createUpdateCard(update) {
+            const { version, codename, date, type, highlights, sections } = update;
+            
+            const versionClass = version.startsWith("Tierra 2025") 
+                ? "text-emerald-400 font-extrabold" 
+                : "text-zinc-100 font-extrabold";
+            
+            const badgeClass = type === "Official" ? "badge-official" : "badge-beta";
+            
+            const formattedDate = new Date(date).toLocaleDateString('es-ES');
+            
+            let sectionsHTML = '';
+            Object.entries(sections).forEach(([title, items]) => {
+                const itemsHTML = items.map(item => `<li>${item}</li>`).join('');
+                sectionsHTML += `
+                    <div>
+                        <h4 class="text-lg font-semibold text-zinc-100">${title}</h4>
+                        <ul class="mt-2 list-disc space-y-1 pl-6 text-zinc-300">
+                            ${itemsHTML}
+                        </ul>
+                    </div>
+                `;
+            });
+            
+            const highlightsHTML = highlights.map(h => `<li>${h}</li>`).join('');
+            
+            return `
+                <div class="update-item">
+                    <div class="card">
+                        <div class="p-6 sm:p-8">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span class="badge ${badgeClass}">${type}</span>
+                                <h3 class="text-2xl tracking-tight ${versionClass}">${version}</h3>
+                                <span class="text-zinc-400">— ${codename}</span>
+                                <span class="ml-auto text-sm text-zinc-400">${formattedDate}</span>
+                            </div>
+                            
+                            <ul class="mt-4 list-disc space-y-2 pl-6 text-zinc-200">
+                                ${highlightsHTML}
+                            </ul>
+                            
+                            <div class="mt-6 grid gap-6">
+                                ${sectionsHTML}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterUpdates() {
+            return UPDATES.filter(update => {
+                const matchType = currentFilter === "all" || update.type === currentFilter;
+                const matchQuery = 
+                    update.version.toLowerCase().includes(currentQuery.toLowerCase()) ||
+                    update.codename.toLowerCase().includes(currentQuery.toLowerCase());
+                return matchType && matchQuery;
+            });
+        }
+
+        function renderUpdates() {
+            const container = document.getElementById('updatesContainer');
+            const filtered = filterUpdates();
+            
+            container.innerHTML = filtered.map(update => createUpdateCard(update)).join('');
+            
+            // Animar las tarjetas
+            const updateItems = container.querySelectorAll('.update-item');
+            updateItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentQuery = e.target.value;
+            renderUpdates();
+        });
+
+        document.getElementById('filterSelect').addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            renderUpdates();
+        });
+
+        // Renderizar inicialmente
+        renderUpdates();
+    </script>
+</body>
+</html>
